@@ -3,85 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tommaso Campagnuolo - Scultore in Marmo</title>
+    <title>VIAGGIATORI - Tommaso Campagnuolo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
+            color: #333;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            color: #333;
         }
-        header {
-            background-color: #2c3e50;
-            color: #ecf0f1;
+        .container {
+            max-width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        h1 {
             text-align: center;
-            padding: 1rem;
-        }
-        main {
-            padding: 2rem;
-            max-width: 1000px;
-            margin: auto;
-        }
-        .artist-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .artist-info img {
-            width: 200px;
-            height: auto;
-            border-radius: 50%;
-            margin-right: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
         }
         .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .gallery img {
-            width: 100%;
+            max-width: 100%;
             height: auto;
-            border-radius: 5px;
-            transition: transform 0.3s ease;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .gallery img:hover {
-            transform: scale(1.05);
-        }
-        footer {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            text-align: center;
-            padding: 1rem;
-            margin-top: 2rem;
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Tommaso Campagnuolo</h1>
-        <p>Scultore in Marmo - Sarno, Salerno</p>
-    </header>
-    <main>
-        <section class="artist-info">
-            <img src="Images/Tommaso.jpg" alt="Tommaso Campagnuolo">
-            <div>
-                <h2>Chi sono</h2>
-                <p>Sono Tommaso Campagnuolo, uno scultore appassionato originario di Sarno, in provincia di Salerno. La mia arte è un viaggio attraverso la pietra, dove ogni scultura racconta una storia unica.</p>
-            </div>
-        </section>
-        <section>
-            <h2>Le mie Opere</h2>
-            <div class="gallery">
-                <img src="Images/Opera001.jpg" alt="Opera 1">
-                <img src="Images/Opera002.jpg" alt="Opera 2">
-                <img src="Images/Opera003.jpg" alt="Opera 3">
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>Contattami: tommaso.campagnuolo@example.com | Tel: +39 123 456 7890</p>
-    </footer>
+    <div class="container">
+        <h1>VIAGGIATORI</h1>
+        <div class="gallery">
+            <img src="images/01.jpg" alt="VIAGGIATORI 1" loading="lazy">
+            <img src="images/02.jpg" alt="VIAGGIATORI 2" loading="lazy">
+            <img src="images/03.jpg" alt="VIAGGIATORI 3" loading="lazy">
+            <img src="images/04.jpg" alt="VIAGGIATORI 4" loading="lazy">
+            <img src="images/05.jpg" alt="VIAGGIATORI 5" loading="lazy">
+            <img src="images/06.jpg" alt="VIAGGIATORI 6" loading="lazy">
+            <img src="images/07.jpg" alt="VIAGGIATORI 7" loading="lazy">
+        </div>
+    </div>
 </body>
 </html>
