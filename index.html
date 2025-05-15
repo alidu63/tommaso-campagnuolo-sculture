@@ -42,23 +42,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding-bottom: 60px; /* Spazio per i controlli */
         }
         
         .slide {
             max-width: 100%;
-            max-height: 80%;
+            max-height: 100%;
             object-fit: contain;
             display: block;
         }
         
         .controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             left: 0;
             right: 0;
             text-align: center;
             z-index: 10;
-            background-color: rgba(0,0,0,0.5);
             padding: 10px 0;
         }
         
@@ -67,6 +67,9 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
+            background-color: rgba(0,0,0,0.6);
+            padding: 8px 15px;
+            border-radius: 30px;
         }
         
         .btn {
@@ -83,6 +86,7 @@
         .indicator {
             padding: 0 10px;
             font-weight: bold;
+            color: white;
         }
         
         .nav-area {
@@ -127,9 +131,23 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Nascondi debug */
         .debug {
             display: none;
+        }
+        
+        /* Stili per tutte le orientazioni - ritratto e paesaggio */
+        @media (orientation: portrait) {
+            .slide {
+                max-width: 95%;
+                max-height: 80%;
+            }
+        }
+        
+        @media (orientation: landscape) {
+            .slide {
+                max-height: 85%;
+                max-width: 95%;
+            }
         }
     </style>
 </head>
@@ -324,213 +342,25 @@
             }
         }, { passive: true });
         
+        // Precarica le diapositive adiacenti per navigazione più fluida
+        function preloadAdjacentSlides() {
+            if (currentSlide < totalSlides) {
+                const nextImg = new Image();
+                nextImg.src = workingPath.folder + formatFileName(currentSlide + 1) + workingPath.ext;
+            }
+            
+            if (currentSlide > 1) {
+                const prevImg = new Image();
+                prevImg.src = workingPath.folder + formatFileName(currentSlide - 1) + workingPath.ext;
+            }
+        }
+        
+        // Precarica quando l'immagine corrente è caricata
+        slide.addEventListener('load', preloadAdjacentSlides);
+        
         // Inizializza
         updateSlide();
     });
-    </script>
-</body>
-</html>
-                // Attendi che tutte le promesse siano risolte
-                Promise.all(testPromises).then(() => {
-                    if (!workingPath) {
-                        workingPath = {folder: 'Images/', ext: '.JPG'};
-                        debugText += "⚠️ Nessun percorso trovato. Uso il percorso predefinito: Images/XXXX.JPG<br>";
-                    }
-                    
-                    debug.innerHTML = debugText;
-                    
-                    // Nascondi il loading spinner
-                    loading.style.display = 'none';
-                    
-                    // Carica la prima slide
-                    updateSlide();
-                    
-                    // Controlla l'orientamento del dispositivo
-                    if (isMobile) {
-                        checkOrientation();
-                    }
-                });
-                
-                debug.innerHTML = debugText;
-            }
-            
-            // Funzione per aggiornare l'immagine
-            function updateSlide() {
-                if (!workingPath) return;
-                
-                // Formatta il numero della diapositiva (0001, 0002, ecc.)
-                let fileName = currentSlide.toString().padStart(4, '0');
-                
-                // Percorso completo
-                const path = workingPath.folder + fileName + workingPath.ext;
-                
-                // Mostra un indicatore di caricamento
-                slideImg.style.opacity = '0.3';
-                
-                // Carica l'immagine
-                const newImg = new Image();
-                newImg.src = path;
-                
-                newImg.onload = function() {
-                    slideImg.src = path;
-                    slideImg.style.opacity = '1';
-                    slideImg.style.border = 'none';
-                    slideImg.style.height = 'auto';
-                    slideImg.style.width = 'auto';
-                    slideImg.style.background = 'none';
-                };
-                
-                newImg.onerror = function() {
-                    debug.style.display = 'block';
-                    debug.innerHTML += `❌ Errore nel caricamento: ${path}<br>`;
-                    slideImg.alt = 'Immagine non trovata';
-                    slideImg.src = '';
-                    slideImg.style.border = '1px dashed white';
-                    slideImg.style.padding = '20px';
-                    slideImg.style.height = '300px';
-                    slideImg.style.width = '400px';
-                    slideImg.style.background = '#111';
-                    slideImg.style.display = 'flex';
-                    slideImg.style.alignItems = 'center';
-                    slideImg.style.justifyContent = 'center';
-                    slideImg.style.textAlign = 'center';
-                    slideImg.style.opacity = '1';
-                };
-                
-                // Aggiorna l'indicatore
-                indicator.textContent = `${currentSlide}/${totalSlides}`;
-                
-                // Abilita/disabilita i pulsanti
-                prevBtn.disabled = (currentSlide === 1);
-                nextBtn.disabled = (currentSlide === totalSlides);
-            }
-            
-            // Funzioni di navigazione
-            function prevSlide() {
-                if (preventDoubleTap) return;
-                preventDoubleTap = true;
-                
-                if (currentSlide > 1) {
-                    currentSlide--;
-                    updateSlide();
-                }
-                
-                setTimeout(() => { preventDoubleTap = false; }, 300);
-            }
-            
-            function nextSlide() {
-                if (preventDoubleTap) return;
-                preventDoubleTap = true;
-                
-                if (currentSlide < totalSlides) {
-                    currentSlide++;
-                    updateSlide();
-                }
-                
-                setTimeout(() => { preventDoubleTap = false; }, 300);
-            }
-            
-            // Event listeners
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            
-            // Touch event handlers
-            prevArea.addEventListener('touchend', function(e) {
-                e.preventDefault(); // Impedisce il comportamento predefinito
-                prevSlide();
-            });
-            
-            nextArea.addEventListener('touchend', function(e) {
-                e.preventDefault(); // Impedisce il comportamento predefinito
-                nextSlide();
-            });
-            
-            // Mouse event handlers
-            prevArea.addEventListener('click', prevSlide);
-            nextArea.addEventListener('click', nextSlide);
-            
-            // Keyboard event handlers
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowLeft') {
-                    prevSlide();
-                } else if (e.key === 'ArrowRight') {
-                    nextSlide();
-                } else if (e.key === 'd' || e.key === 'D') {
-                    // Toggle debug info
-                    debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
-                }
-            });
-            
-            // Gestione swipe per dispositivi mobili
-            let touchStartX = 0;
-            let touchStartY = 0;
-            
-            document.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-                touchStartY = e.changedTouches[0].screenY;
-            }, { passive: false });
-            
-            document.addEventListener('touchend', function(e) {
-                const touchEndX = e.changedTouches[0].screenX;
-                const touchEndY = e.changedTouches[0].screenY;
-                
-                const diffX = touchStartX - touchEndX;
-                const diffY = touchStartY - touchEndY;
-                
-                // Assicurati che il movimento sia più orizzontale che verticale
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-                    if (diffX > 0) {
-                        nextSlide(); // Swipe verso sinistra
-                    } else {
-                        prevSlide(); // Swipe verso destra
-                    }
-                }
-            }, { passive: false });
-            
-            // Disabilita il doppio tap per lo zoom su mobile
-            document.addEventListener('touchend', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-            
-            // Gestione orientamento dispositivo
-            window.addEventListener('resize', function() {
-                isMobile = window.innerWidth <= 768;
-                checkOrientation();
-            });
-            
-            window.addEventListener('orientationchange', function() {
-                setTimeout(checkOrientation, 300); // Breve ritardo per permettere il ridimensionamento
-            });
-            
-            // Inizializza cercando il percorso giusto
-            findWorkingPath();
-            
-            // Precarica le immagini successive per una navigazione più fluida
-            function preloadNextImage() {
-                if (currentSlide < totalSlides) {
-                    const nextFileName = (currentSlide + 1).toString().padStart(4, '0');
-                    const nextPath = workingPath.folder + nextFileName + workingPath.ext;
-                    const img = new Image();
-                    img.src = nextPath;
-                }
-            }
-            
-            // Aggiungi event listener per sapere quando l'immagine corrente è caricata
-            slideImg.addEventListener('load', preloadNextImage);
-            
-            // Aggiungi fullscreen su doppio click
-            document.addEventListener('dblclick', function() {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => {
-                        console.log(`Error attempting to enable full-screen mode: ${err.message}`);
-                    });
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
-                }
-            });
-        });
     </script>
 </body>
 </html>Number <= 1;
