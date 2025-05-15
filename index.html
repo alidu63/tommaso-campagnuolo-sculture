@@ -42,7 +42,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-bottom: 60px; /* Spazio per i controlli */
+            padding-bottom: 50px; /* Spazio per i controlli */
         }
         
         .slide {
@@ -54,29 +54,29 @@
         
         .controls {
             position: fixed;
-            bottom: 10px;
+            bottom: 5px;
             left: 0;
             right: 0;
             text-align: center;
             z-index: 10;
-            padding: 10px 0;
+            padding: 5px 0;
         }
         
         .control-inner {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            background-color: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border-radius: 30px;
+            gap: 15px;
+            background-color: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 20px;
         }
         
         .btn {
             background-color: #264c73;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 5px;
             font-size: 14px;
             font-weight: bold;
@@ -92,7 +92,7 @@
         .nav-area {
             position: absolute;
             top: 0;
-            height: 85%;
+            height: 100%;
             width: 50%;
             z-index: 5;
         }
@@ -135,18 +135,23 @@
             display: none;
         }
         
-        /* Stili per tutte le orientazioni - ritratto e paesaggio */
-        @media (orientation: portrait) {
-            .slide {
-                max-width: 95%;
-                max-height: 80%;
+        /* Stili per dispositivi mobili */
+        @media screen and (max-width: 768px) {
+            .slide-container {
+                padding: 0;
             }
-        }
-        
-        @media (orientation: landscape) {
+            
             .slide {
-                max-height: 85%;
-                max-width: 95%;
+                max-width: 100%;
+                max-height: 90%;
+            }
+            
+            .controls {
+                bottom: 10px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
             }
         }
     </style>
@@ -168,9 +173,9 @@
     
     <div class="controls">
         <div class="control-inner">
-            <button class="btn" id="prev-btn">Precedente</button>
+            <button class="btn" id="prev-btn">◀</button>
             <span class="indicator" id="indicator">1/13</span>
-            <button class="btn" id="next-btn">Successiva</button>
+            <button class="btn" id="next-btn">▶</button>
         </div>
     </div>
     
