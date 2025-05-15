@@ -19,14 +19,22 @@
             width: 100%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
         }
         .slide {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 90%;
+            max-height: 90%;
             object-fit: contain;
+        }
+        .slide-container {
+            width: 100%;
+            height: 85%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .controls {
             position: fixed;
@@ -69,11 +77,33 @@
         .right-area {
             right: 0;
         }
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 5px;
+            max-width: 300px;
+            z-index: 1000;
+            color: #fff;
+        }
+        .preload-container {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
-    <div class="viewer" id="viewer">
-        <img class="slide" id="slide">
+    <div class="viewer">
+        <div class="slide-container">
+            <img class="slide" id="slide" alt="Diapositiva">
+        </div>
         <div class="left-area" id="prevArea"></div>
         <div class="right-area" id="nextArea"></div>
     </div>
@@ -83,6 +113,13 @@
         <span class="indicator" id="indicator">1/13</span>
         <button class="btn" id="nextBtn">Successiva</button>
     </div>
+    
+    <div class="debug-info" id="debug">
+        Informazioni di debug...
+    </div>
+    
+    <!-- Precarica le immagini per vedere quali percorsi funzionano -->
+    <div class="preload-container" id="preload"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -93,18 +130,77 @@
             const indicator = document.getElementById('indicator');
             const prevArea = document.getElementById('prevArea');
             const nextArea = document.getElementById('nextArea');
+            const debug = document.getElementById('debug');
+            const preloadContainer = document.getElementById('preload');
             
             // Configurazione
             const totalSlides = 13;
             let currentSlide = 1;
+            let workingPath = null; // Memorizza il percorso che funziona
+            
+            // Generazione dinamica dell'elenco dei percorsi possibili
+            const cartelle = ['Images/', 'images/', 'Image/', 'image/', '../Images/', '../images/', '/Images/', '/images/'];
+            const estensioni = ['.JPG', '.jpg', '.jpeg', '.png'];
+            
+            // Determina quale percorso funziona
+            function findWorkingPath() {
+                let debugText = "Cercando percorso funzionante...<br>";
+                
+                // Prova ogni percorso per il primo file
+                for (let folder of cartelle) {
+                    for (let ext of estensioni) {
+                        const fileName = "0001" + ext;
+                        const path = folder + fileName;
+                        
+                        const testImg = new Image();
+                        testImg.src = path;
+                        
+                        // Aggiungi al preload container
+                        preloadContainer.appendChild(testImg);
+                        
+                        debugText += `Provo: ${path}<br>`;
+                        
+                        // Gestisci evento di caricamento
+                        testImg.onload = function() {
+                            if (!workingPath) {
+                                workingPath = {folder: folder, ext: ext};
+                                debugText += `✓ Trovato percorso funzionante: ${folder}XXXX${ext}<br>`;
+                                debug.innerHTML = debugText;
+                                
+                                // Carica la prima slide
+                                updateSlide();
+                            }
+                        };
+                    }
+                }
+                
+                // Impostazione di fallback dopo 2 secondi
+                setTimeout(function() {
+                    if (!workingPath) {
+                        workingPath = {folder: 'Images/', ext: '.JPG'};
+                        debugText += "⚠️ Nessun percorso trovato. Uso il percorso predefinito: Images/XXXX.JPG<br>";
+                        debug.innerHTML = debugText;
+                        updateSlide();
+                    }
+                }, 2000);
+                
+                debug.innerHTML = debugText;
+            }
             
             // Funzione per aggiornare l'immagine
             function updateSlide() {
+                if (!workingPath) return;
+                
                 // Formatta il numero della diapositiva (0001, 0002, ecc.)
                 let fileName = currentSlide.toString().padStart(4, '0');
                 
+                // Percorso completo
+                const path = workingPath.folder + fileName + workingPath.ext;
+                
+                debug.innerHTML += `Carico: ${path}<br>`;
+                
                 // Carica l'immagine
-                slideImg.src = `Images/${fileName}.JPG`;
+                slideImg.src = path;
                 
                 // Aggiorna l'indicatore
                 indicator.textContent = `${currentSlide}/${totalSlides}`;
@@ -115,14 +211,26 @@
                 
                 // Gestisci errori di caricamento
                 slideImg.onerror = function() {
-                    // Prova con percorso alternativo
-                    this.src = `images/${fileName}.JPG`;
-                    
-                    // Se anche questo fallisce
-                    this.onerror = function() {
-                        this.alt = 'Immagine non trovata';
-                        this.style.display = 'none';
-                    };
+                    debug.innerHTML += `❌ Errore nel caricamento: ${path}<br>`;
+                    slideImg.alt = 'Immagine non trovata';
+                    slideImg.style.border = '1px dashed white';
+                    slideImg.style.padding = '20px';
+                    slideImg.style.height = '400px';
+                    slideImg.style.width = '600px';
+                    slideImg.style.display = 'flex';
+                    slideImg.style.alignItems = 'center';
+                    slideImg.style.justifyContent = 'center';
+                    slideImg.style.textAlign = 'center';
+                    slideImg.style.fontSize = '18px';
+                };
+                
+                slideImg.onload = function() {
+                    debug.innerHTML += `✓ Immagine caricata: ${path}<br>`;
+                    slideImg.style.border = 'none';
+                    slideImg.style.padding = '0';
+                    slideImg.style.height = 'auto';
+                    slideImg.style.width = 'auto';
+                    slideImg.style.display = 'block';
                 };
             }
             
@@ -152,6 +260,9 @@
                     prevSlide();
                 } else if (e.key === 'ArrowRight') {
                     nextSlide();
+                } else if (e.key === 'd' || e.key === 'D') {
+                    // Toggle debug info
+                    debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
                 }
             });
             
@@ -175,8 +286,15 @@
                 }
             });
             
-            // Inizializza con la prima slide
-            updateSlide();
+            // Inizializza cercando il percorso giusto
+            findWorkingPath();
+            
+            // Nascondi il debug dopo 5 secondi se non ci sono problemi
+            setTimeout(function() {
+                if (workingPath) {
+                    debug.style.display = 'none';
+                }
+            }, 5000);
         });
     </script>
 </body>
