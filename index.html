@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     <style>
         * {
@@ -26,14 +25,12 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            touch-action: pan-y;
         }
         
         .viewer {
             width: 100%;
             height: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
@@ -45,156 +42,63 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
         
         .slide {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 80%;
             object-fit: contain;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-user-drag: none;
+            display: block;
         }
         
         .controls {
             position: fixed;
-            bottom: env(safe-area-inset-bottom, 20px);
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            background-color: rgba(0,0,0,0.6);
-            padding: 10px 15px;
-            border-radius: 30px;
-            z-index: 100;
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px 0;
         }
         
-        @media (max-height: 500px) {
-            .controls {
-                bottom: 10px;
-                padding: 5px 10px;
-            }
+        .control-inner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
         
         .btn {
             background-color: #264c73;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
             font-weight: bold;
-            -webkit-user-select: none;
-            user-select: none;
-            transition: transform 0.2s;
-        }
-        
-        @media (max-width: 480px) {
-            .btn {
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-        }
-        
-        @media (max-height: 500px) {
-            .btn {
-                padding: 5px 10px;
-                font-size: 12px;
-            }
-        }
-        
-        .btn:active {
-            transform: scale(0.95);
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            cursor: pointer;
         }
         
         .indicator {
             padding: 0 10px;
             font-weight: bold;
-            font-size: 16px;
         }
         
-        @media (max-width: 480px) {
-            .indicator {
-                font-size: 14px;
-            }
-        }
-        
-        .left-area, .right-area {
+        .nav-area {
             position: absolute;
             top: 0;
-            height: 100%;
-            width: 40%;
-            z-index: 10;
+            height: 85%;
+            width: 50%;
+            z-index: 5;
         }
         
-        .left-area {
+        .nav-left {
             left: 0;
         }
         
-        .right-area {
+        .nav-right {
             right: 0;
-        }
-        
-        .debug-info {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(0,0,0,0.7);
-            padding: 10px;
-            font-size: 12px;
-            border-radius: 5px;
-            max-width: 300px;
-            z-index: 1000;
-            color: #fff;
-            display: none;
-        }
-        
-        .preload-container {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-        
-        .rotate-prompt {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            flex-direction: column;
-        }
-        
-        .rotate-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            animation: rotate 2s infinite;
-        }
-        
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(90deg); }
-            50% { transform: rotate(90deg); }
-            75% { transform: rotate(0deg); }
-            100% { transform: rotate(0deg); }
         }
         
         .loading {
@@ -203,24 +107,29 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: #000;
             z-index: 9999;
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: #fff;
+            border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* Nascondi debug */
+        .debug {
+            display: none;
         }
     </style>
 </head>
@@ -230,119 +139,197 @@
         <div class="spinner"></div>
     </div>
     
-    <!-- Rotate device prompt for mobile -->
-    <div class="rotate-prompt" id="rotatePrompt">
-        <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="4" width="12" height="16" rx="2" ry="2"></rect>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <path d="M9 1L3 5L9 9"></path>
-        </svg>
-        <p>Ruota il dispositivo per una visione migliore</p>
-    </div>
-    
     <div class="viewer">
         <div class="slide-container">
             <img class="slide" id="slide" alt="Diapositiva">
         </div>
-        <div class="left-area" id="prevArea"></div>
-        <div class="right-area" id="nextArea"></div>
+        
+        <div class="nav-area nav-left" id="prev-area"></div>
+        <div class="nav-area nav-right" id="next-area"></div>
     </div>
     
     <div class="controls">
-        <button class="btn" id="prevBtn">◀</button>
-        <span class="indicator" id="indicator">1/13</span>
-        <button class="btn" id="nextBtn">▶</button>
+        <div class="control-inner">
+            <button class="btn" id="prev-btn">Precedente</button>
+            <span class="indicator" id="indicator">1/13</span>
+            <button class="btn" id="next-btn">Successiva</button>
+        </div>
     </div>
     
-    <div class="debug-info" id="debug">
-        Informazioni di debug...
-    </div>
-    
-    <!-- Precarica le immagini per vedere quali percorsi funzionano -->
-    <div class="preload-container" id="preload"></div>
+    <div class="debug" id="debug"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elementi DOM
-            const slideImg = document.getElementById('slide');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const indicator = document.getElementById('indicator');
-            const prevArea = document.getElementById('prevArea');
-            const nextArea = document.getElementById('nextArea');
-            const debug = document.getElementById('debug');
-            const preloadContainer = document.getElementById('preload');
-            const loading = document.getElementById('loading');
-            const rotatePrompt = document.getElementById('rotatePrompt');
+    // Attendi che il documento sia caricato
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementi DOM
+        const slide = document.getElementById('slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const indicator = document.getElementById('indicator');
+        const prevArea = document.getElementById('prev-area');
+        const nextArea = document.getElementById('next-area');
+        const loading = document.getElementById('loading');
+        
+        // Configurazione
+        const totalSlides = 13;
+        let currentSlide = 1;
+        
+        // Percorsi possibili per le immagini
+        const paths = [
+            { folder: 'Images/', ext: '.JPG' },
+            { folder: 'images/', ext: '.JPG' },
+            { folder: 'Images/', ext: '.jpg' },
+            { folder: 'images/', ext: '.jpg' }
+        ];
+        
+        let workingPath = paths[0]; // Default
+        
+        // Funzione per formattare il nome del file
+        function formatFileName(num) {
+            return num.toString().padStart(4, '0');
+        }
+        
+        // Funzione per aggiornare l'immagine
+        function updateSlide() {
+            // Disabilita i pulsanti durante il caricamento
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
             
-            // Configurazione
-            const totalSlides = 13;
-            let currentSlide = 1;
-            let workingPath = null; // Memorizza il percorso che funziona
-            let isMobile = window.innerWidth <= 768;
-            let preventDoubleTap = false;
+            // Formatta il nome del file
+            const fileName = formatFileName(currentSlide);
             
-            // Generazione dinamica dell'elenco dei percorsi possibili
-            const cartelle = ['Images/', 'images/', 'Image/', 'image/', '../Images/', '../images/', '/Images/', '/images/'];
-            const estensioni = ['.JPG', '.jpg', '.jpeg', '.png'];
+            // Costruisci il percorso
+            const path = workingPath.folder + fileName + workingPath.ext;
             
-            // Controlla orientamento dispositivo
-            function checkOrientation() {
-                if (isMobile) {
-                    if (window.innerHeight > window.innerWidth) {
-                        // Dispositivo in modalità ritratto
-                        rotatePrompt.style.display = 'flex';
-                    } else {
-                        // Dispositivo in modalità paesaggio
-                        rotatePrompt.style.display = 'none';
-                    }
-                }
+            // Carica l'immagine
+            slide.style.opacity = '0.5'; // Effetto di caricamento
+            
+            // Aggiorna l'indicatore
+            indicator.textContent = `${currentSlide}/${totalSlides}`;
+            
+            // Carica l'immagine
+            slide.src = path;
+            
+            // Quando l'immagine è caricata
+            slide.onload = function() {
+                slide.style.opacity = '1';
+                
+                // Aggiorna stato pulsanti
+                prevBtn.disabled = (currentSlide <= 1);
+                nextBtn.disabled = (currentSlide >= totalSlides);
+                
+                // Se siamo al primo caricamento, nascondi il loading spinner
+                loading.style.display = 'none';
+            };
+            
+            // Se l'immagine non può essere caricata
+            slide.onerror = function() {
+                // Prova con altri percorsi se disponibili
+                tryAlternativePath(fileName, 0);
+            };
+        }
+        
+        // Funzione per provare percorsi alternativi
+        function tryAlternativePath(fileName, index) {
+            if (index >= paths.length) {
+                // Tutti i percorsi falliti
+                slide.style.opacity = '1';
+                slide.src = '';
+                slide.alt = 'Immagine non trovata';
+                
+                // Nascondi il loading spinner
+                loading.style.display = 'none';
+                
+                // Aggiorna stato pulsanti
+                prevBtn.disabled = (currentSlide <= 1);
+                nextBtn.disabled = (currentSlide >= totalSlides);
+                
+                return;
             }
             
-            // Determina quale percorso funziona
-            function findWorkingPath() {
-                let debugText = "Cercando percorso funzionante...<br>";
+            // Prova con il percorso corrente
+            const path = paths[index].folder + fileName + paths[index].ext;
+            const testImg = new Image();
+            testImg.src = path;
+            
+            testImg.onload = function() {
+                // Percorso trovato, salva ed usa
+                workingPath = paths[index];
+                slide.src = path;
+                slide.style.opacity = '1';
                 
-                // Prova ogni percorso per il primo file
-                let testPromises = [];
+                // Nascondi il loading spinner
+                loading.style.display = 'none';
                 
-                for (let folder of cartelle) {
-                    for (let ext of estensioni) {
-                        const fileName = "0001" + ext;
-                        const path = folder + fileName;
-                        
-                        const testPromise = new Promise((resolve) => {
-                            const testImg = new Image();
-                            testImg.src = path;
-                            
-                            // Aggiungi al preload container
-                            preloadContainer.appendChild(testImg);
-                            
-                            debugText += `Provo: ${path}<br>`;
-                            
-                            // Gestisci evento di caricamento
-                            testImg.onload = function() {
-                                if (!workingPath) {
-                                    workingPath = {folder: folder, ext: ext};
-                                    debugText += `✓ Trovato percorso funzionante: ${folder}XXXX${ext}<br>`;
-                                    resolve(true);
-                                } else {
-                                    resolve(false);
-                                }
-                            };
-                            
-                            testImg.onerror = function() {
-                                resolve(false);
-                            };
-                            
-                            // Timeout per le immagini che non rispondono
-                            setTimeout(() => resolve(false), 1000);
-                        });
-                        
-                        testPromises.push(testPromise);
-                    }
+                // Aggiorna stato pulsanti
+                prevBtn.disabled = (currentSlide <= 1);
+                nextBtn.disabled = (currentSlide >= totalSlides);
+            };
+            
+            testImg.onerror = function() {
+                // Prova con il prossimo percorso
+                tryAlternativePath(fileName, index + 1);
+            };
+        }
+        
+        // Funzioni di navigazione
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+        
+        // Event listeners
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        
+        // Area di navigazione
+        prevArea.addEventListener('click', prevSlide);
+        nextArea.addEventListener('click', nextSlide);
+        
+        // Navigazione con tastiera
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+        
+        // Navigazione touch (swipe)
+        let touchStartX = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function(e) {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diffX = touchStartX - touchEndX;
+            
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    nextSlide(); // Swipe verso sinistra
+                } else {
+                    prevSlide(); // Swipe verso destra
                 }
-                
+            }
+        }, { passive: true });
+        
+        // Inizializza
+        updateSlide();
+    });
+    </script>
+</body>
+</html>
                 // Attendi che tutte le promesse siano risolte
                 Promise.all(testPromises).then(() => {
                     if (!workingPath) {
